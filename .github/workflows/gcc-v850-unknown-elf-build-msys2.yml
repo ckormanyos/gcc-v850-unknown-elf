@@ -8,6 +8,8 @@ on:
     branches:
       - '**'
   pull_request:
+  schedule:
+    - cron: '30 10 2 * *' # run at 10:30 AM every second day of the month UTC (see also https://cloud.google.com/scheduler/docs/configuring/cron-job-schedules?hl=en)
 jobs:
   gcc-v850-unknown-elf-build-msys2:
     runs-on: windows-latest
@@ -43,8 +45,8 @@ jobs:
         run: |
           echo 'gcc-v850-unknown-elf partial verify result'
           ls -la /d/a/gcc-v850-unknown-elf/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin
-          ls -la /d/a/gcc-v850-unknown-elf/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin/gcc-v850-unknown-elf.exe
-          ls -la /d/a/gcc-v850-unknown-elf/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin/avr-g++.exe
+          ls -la /d/a/gcc-v850-unknown-elf/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin/v850-unknown-elf-gcc.exe
+          ls -la /d/a/gcc-v850-unknown-elf/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin/v850-unknown-elf-g++.exe
       - uses: actions/upload-artifact@v4
         with:
           name: gcc-${{ matrix.gccversion }}-v850-unknown-elf
