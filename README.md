@@ -15,11 +15,10 @@ on GHA native runner(s). Built toolchains are distributed as ZIP-archive(s)
 directly from the Workflow-Run(s) on GHA.
 
 Design goals:
-  - Use shell and YAML scripts to build modern `gcc-v850-unknown-elf` on-the-fly.
-  - Build `gcc-v850-unknown-elf` from up-to-date releases such as 13.2.0.
+  - Use shell and YAML scripts to build `gcc-v850-unknown-elf` from up-to-date [gcc-release(s)](https://gcc.gnu.org/pub/gcc/releases).
   - Provide a non-trivial test of the newly-built toolchain(s) based on a real-world project.
-  - Support cyclic monthly build of modern, evolving GCC branch(es) and trunk.
   - Publish the build artifacts directly from the Workflow-Run(s) on GHA.
+  - Support cyclic monthly build of modern, evolving [gcc-release(s)](https://gcc.gnu.org/pub/gcc/releases).
 
 ## Workflow-Run
 
