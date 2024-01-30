@@ -31,23 +31,23 @@ jobs:
       - name: gcc-v850-unknown-elf-partially-verify-result
         run: |
           echo 'gcc-v850-unknown-elf partial verify result'
-          ls -la ${{ runner.workspace }}/gcc-v850-unknown-elf-build/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin
-          ls -la ${{ runner.workspace }}/gcc-v850-unknown-elf-build/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin/v850-unknown-elf-gcc
-          ls -la ${{ runner.workspace }}/gcc-v850-unknown-elf-build/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin/v850-unknown-elf-g++
-          cd ${{ runner.workspace }}/gcc-v850-unknown-elf-build/local
+          ls -la ${{ runner.workspace }}/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin
+          ls -la ${{ runner.workspace }}/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin/v850-unknown-elf-gcc
+          ls -la ${{ runner.workspace }}/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin/v850-unknown-elf-g++
+          cd ${{ runner.workspace }}/gcc-v850-unknown-elf/local
           tar -czf gcc-${{ matrix.gccversion }}-v850-unknown-elf.tar.gz gcc-${{ matrix.gccversion }}-v850-unknown-elf
       - uses: actions/upload-artifact@v4
         with:
           name: gcc-${{ matrix.gccversion }}-avr_x86_64-linux-gnu
-          path: ${{ runner.workspace }}/gcc-v850-unknown-elf-build/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf.tar.gz
+          path: ${{ runner.workspace }}/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf.tar.gz
           retention-days: 3
       - name: gcc-v850-unknown-elf-test-with-real-time-cpp
         run: |
           echo "test gcc-v850-unknown-elf with real-time-cpp"
           echo "clone ckormanyos/real-time-cpp"
-          git clone -b master --depth 1 https://github.com/ckormanyos/real-time-cpp.git ${{ runner.workspace }}/gcc-v850-unknown-elf-build/real-time-cpp
-          cd ${{ runner.workspace }}/gcc-v850-unknown-elf-build/real-time-cpp/ref_app
-          PATH=${{ runner.workspace }}/gcc-v850-unknown-elf-build/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin:"$PATH"
+          git clone -b master --depth 1 https://github.com/ckormanyos/real-time-cpp.git ${{ runner.workspace }}/gcc-v850-unknown-elf/real-time-cpp
+          cd ${{ runner.workspace }}/gcc-v850-unknown-elf/real-time-cpp/ref_app
+          PATH=${{ runner.workspace }}/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin:"$PATH"
           ./target/build/build.sh v850es_fx2 rebuild
           ls -la bin/ref_app.elf bin/ref_app.hex
           ls -la bin/ref_app.map bin/ref_app.s19
