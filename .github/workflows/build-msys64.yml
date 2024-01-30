@@ -47,7 +47,7 @@ jobs:
           ls -la /d/a/gcc-v850-unknown-elf/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin/v850-unknown-elf-g++.exe
       - uses: actions/upload-artifact@v4
         with:
-          name: gcc-${{ matrix.gccversion }}-avr_x86_64-w64-mingw32
+          name: gcc-${{ matrix.gccversion }}-v850-unknown-elf_x86_64-w64-mingw32
           path: d:/a/gcc-v850-unknown-elf/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf
       - name: gcc-v850-unknown-elf-test-with-real-time-cpp
         run: |

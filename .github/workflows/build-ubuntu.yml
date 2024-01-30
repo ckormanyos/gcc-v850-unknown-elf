@@ -38,7 +38,7 @@ jobs:
           tar -czf gcc-${{ matrix.gccversion }}-v850-unknown-elf.tar.gz gcc-${{ matrix.gccversion }}-v850-unknown-elf
       - uses: actions/upload-artifact@v4
         with:
-          name: gcc-${{ matrix.gccversion }}-avr_x86_64-linux-gnu
+          name: gcc-${{ matrix.gccversion }}-v850-unknown-elf_x86_64-linux-gnu
           path: ${{ runner.workspace }}/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf.tar.gz
           retention-days: 3
       - name: gcc-v850-unknown-elf-test-with-real-time-cpp
