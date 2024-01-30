@@ -1,0 +1,57 @@
+##############################################################################
+#  Copyright Christopher Kormanyos 2023 - 2024.
+#  Distributed under The Unlicense.
+
+name: build-ubuntu
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+jobs:
+  gcc-v850-unknown-elf-build-native:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        gccversion: [ 13.2.0 ]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+      - name: update-build-essentials
+        run: sudo apt install autoconf texinfo xz-utils
+      - name: gcc-v850-unknown-elf-100
+        run: |
+          echo 'gcc-v850-unknown-elf-100.sh'
+          ./gcc-v850-unknown-elf-100.sh ${{ matrix.gccversion }} x86_64-linux-gnu x86_64-linux-gnu
+      - name: gcc-v850-unknown-elf-partially-verify-result
+        run: |
+          echo 'gcc-v850-unknown-elf partial verify result'
+          ls -la ${{ runner.workspace }}/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin
+          ls -la ${{ runner.workspace }}/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin/v850-unknown-elf-gcc
+          ls -la ${{ runner.workspace }}/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin/v850-unknown-elf-g++
+          cd ${{ runner.workspace }}/gcc-v850-unknown-elf/local
+          tar -czf gcc-${{ matrix.gccversion }}-v850-unknown-elf.tar.gz gcc-${{ matrix.gccversion }}-v850-unknown-elf
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gcc-${{ matrix.gccversion }}-avr_x86_64-linux-gnu
+          path: ${{ runner.workspace }}/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf.tar.gz
+          retention-days: 3
+      - name: gcc-v850-unknown-elf-test-with-real-time-cpp
+        run: |
+          echo "test gcc-v850-unknown-elf with real-time-cpp"
+          echo "clone ckormanyos/real-time-cpp"
+          git clone -b master --depth 1 https://github.com/ckormanyos/real-time-cpp.git ${{ runner.workspace }}/gcc-v850-unknown-elf/real-time-cpp
+          cd ${{ runner.workspace }}/gcc-v850-unknown-elf/real-time-cpp/ref_app
+          PATH=${{ runner.workspace }}/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin:"$PATH"
+          ./target/build/build.sh v850es_fx2 rebuild
+          ls -la bin/ref_app.elf bin/ref_app.hex
+          ls -la bin/ref_app.map bin/ref_app.s19
+          ls -la bin/ref_app_cppfilt.txt
+          ls -la bin/ref_app_nm.txt
+          ls -la bin/ref_app_readelf.txt
+          ls -la bin/ref_app_size.txt
