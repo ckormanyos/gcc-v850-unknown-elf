@@ -39,7 +39,7 @@ Workflow-Run(s).
 ## Workflow-Run
 
 Workflow:
-  - Use the shell script [avr-gcc-100.sh](./avr-gcc-100.sh) consistently in each of the Workflow-Run(s).
+  - Use the shell script [gcc-v850-unknown-elf-100.sh](./gcc-v850-unknown-elf-100.sh) consistently in each of the Workflow-Run(s).
   - The Workflow-Run [build-ubuntu.yml](./.github/workflows/build-ubuntu.yml) builds `avr-gcc` for the _host_ `x86_64-linux-gnu`. The script is executed on a GHA `ubuntu-latest` runner.
   - The Workflow-Run [build-msys64.yml](./.github/workflows/build-msys64.yml) builds `avr-gcc` for the _host_ `x86_64-w64-mingw32`. The script is executed on a GHA `windows-latest` runner using `msys64`.
   - When building for `x86_64-w64-mingw32` on `msys64`, use a pre-built, dependency-free, statically linked `mingw` and host-compiler (see notes below). This separate `mingw` package is unpacked in a directory parallel to the runner workspace and its `bin` directory is added to the `PATH` variable.
