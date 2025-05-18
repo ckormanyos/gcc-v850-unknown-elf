@@ -1,5 +1,5 @@
 ##############################################################################
-#  Copyright Christopher Kormanyos 2023 - 2024.
+#  Copyright Christopher Kormanyos 2023 - 2025.
 #  Distributed under The Unlicense.
 
 name: build-msys64
@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        gccversion: [ 13.2.0 ]
+        gccversion: [ 14.2.0 ]
     steps:
       - uses: actions/checkout@v4
       - name: get-nuwen-mingw
@@ -54,7 +54,6 @@ jobs:
           echo "test gcc-v850-unknown-elf with real-time-cpp"
           echo "clone ckormanyos/real-time-cpp"
           git clone -b master --depth 1 https://github.com/ckormanyos/real-time-cpp.git /d/a/gcc-v850-unknown-elf/gcc-v850-unknown-elf/real-time-cpp
-          rm -rf /d/a/gcc-v850-unknown-elf/gcc-v850-unknown-elf/local/gcc-${{ matrix.branchname }}-v850-unknown-elf/lib/bfd-plugins
           cd /d/a/gcc-v850-unknown-elf/gcc-v850-unknown-elf/real-time-cpp/ref_app
           PATH=/d/a/gcc-v850-unknown-elf/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin:"$PATH"
           ./target/build/build.sh v850es_fx2 rebuild
