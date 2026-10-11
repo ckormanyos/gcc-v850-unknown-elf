@@ -157,6 +157,7 @@ cd objdir-binutils-2.44-v850-unknown-elf-gcc-"$MY_VERSION"
 ../binutils-2.44/configure --prefix=$SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf --target=v850-unknown-elf --enable-languages=c,c++ --build="$BUILD_NAME" --host="$HOST_NAME" --with-pkgversion='Built by ckormanyos/real-time-cpp' --disable-plugins --enable-static --disable-shared --disable-tls --disable-libada --disable-libssp --disable-nls --enable-mingw-wildcard --with-gnu-as --with-dwarf2 --disable-__cxa_atexit --disable-threads --disable-win32-registry --disable-sjlj-exceptions --with-isl=$SCRIPT_DIR/local/isl-0.24 --with-cloog=$SCRIPT_DIR/local/cloog-0.18.1 --with-gmp=$SCRIPT_DIR/local/gmp-6.3.0 --with-mpfr=$SCRIPT_DIR/local/mpfr-4.2.1 --with-mpc=$SCRIPT_DIR/local/mpc-1.3.1 --with-libiconv-prefix=$SCRIPT_DIR/local/libiconv-1.17 --with-zstd=$SCRIPT_DIR/local/zstd-1.5.5/lib --disable-werror --enable-obsolete
 make --jobs=6
 make install
+export PATH="$SCRIPT_DIR/local/gcc-16.2.0-v850-unknown-elf/bin:$PATH"
 echo
 
 
@@ -173,18 +174,20 @@ cd $SCRIPT_DIR/gcc_build
 echo 'build gcc'
 tar -xf gcc-"$MY_VERSION".tar.xz
 tar -xf newlib-4.5.0.20241231.tar.gz
-
-cd gcc-"$MY_VERSION"
-./contrib/symlink-newlib ../newlib-4.5.0.20241231
+cd newlib-4.5.0.20241231
+cp -r newlib libgloss ../gcc-"$MY_VERSION"
 cd ..
-
 mkdir objdir-gcc-"$MY_VERSION"-v850-unknown-elf
 cd objdir-gcc-"$MY_VERSION"-v850-unknown-elf
 ../gcc-"$MY_VERSION"/configure --prefix=$SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf --target=v850-unknown-elf --enable-languages=c,c++ --build="$BUILD_NAME" --host="$HOST_NAME" --with-pkgversion='Built by ckormanyos/real-time-cpp' --disable-gcov --enable-static --disable-shared --with-newlib --with-headers --disable-tls --disable-libada --disable-libssp --disable-nls --enable-mingw-wildcard --with-gnu-as --with-dwarf2 --disable-__cxa_atexit --disable-threads --disable-win32-registry --disable-sjlj-exceptions --disable-libquadmath --disable-fixed-point --disable-decimal-float --with-isl=$SCRIPT_DIR/local/isl-0.24 --with-cloog=$SCRIPT_DIR/local/cloog-0.18.1 --with-gmp=$SCRIPT_DIR/local/gmp-6.3.0 --with-mpfr=$SCRIPT_DIR/local/mpfr-4.2.1 --with-mpc=$SCRIPT_DIR/local/mpc-1.3.1 --with-libiconv-prefix=$SCRIPT_DIR/local/libiconv-1.17 --with-zstd=$SCRIPT_DIR/local/zstd-1.5.5/lib --enable-obsolete
-make --jobs=6
-make install
-echo
 
+# Explicitly build the compiler, newlib, and target support libraries
+make --jobs=6 all-gcc all-target-libgcc all-target-newlib all-target-libgloss
+
+# Explicitly install them all
+make install-gcc install-target-libgcc install-target-newlib install-target-libgloss
+
+echo
 
 ls -la $SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf/bin
 ls -la $SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf/bin/v850-unknown-elf-gcc*
