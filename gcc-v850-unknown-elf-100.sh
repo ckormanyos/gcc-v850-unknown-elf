@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-#  Copyright Christopher Kormanyos 2023 - 2025.
+#  Copyright Christopher Kormanyos 2023 - 2026.
 #  Distributed under The Unlicense.
 #
 # Example call(s):
@@ -22,7 +22,7 @@ if [[ "$BUILD_NAME" == "x86_64-w64-mingw32" ]]; then
 
 # Get standalone msys2 from nuwen (contains standalone gcc-x86_64-w64-mingw32).
 # The page describing this is: https://nuwen.net/mingw.html
-# The exact download link is: https://nuwen.net/files/mingw/mingw-19.0.exe
+# The exact download link is: https://nuwen.net/files/mingw/history/mingw-19.0.exe
 
 # For detailed background information, see also the detailed instructions
 # at GitHub from Stephan T. Lavavej's repositiony.
@@ -154,7 +154,7 @@ echo 'build binutils'
 tar -xf binutils-2.44.tar.xz
 mkdir objdir-binutils-2.44-v850-unknown-elf-gcc-"$MY_VERSION"
 cd objdir-binutils-2.44-v850-unknown-elf-gcc-"$MY_VERSION"
-../binutils-2.44/configure --prefix=$SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf --target=v850-unknown-elf --enable-languages=c,c++ --build="$BUILD_NAME" --host="$HOST_NAME" --with-pkgversion='Built by ckormanyos/real-time-cpp' --disable-plugins --enable-static --disable-shared --disable-tls --disable-libada --disable-libssp --disable-nls --enable-mingw-wildcard --with-gnu-as --with-dwarf2 --disable-__cxa_atexit --disable-threads --disable-win32-registry --disable-sjlj-exceptions --with-isl=$SCRIPT_DIR/local/isl-0.24 --with-cloog=$SCRIPT_DIR/local/cloog-0.18.1 --with-gmp=$SCRIPT_DIR/local/gmp-6.3.0 --with-mpfr=$SCRIPT_DIR/local/mpfr-4.2.1 --with-mpc=$SCRIPT_DIR/local/mpc-1.3.1 --with-libiconv-prefix=$SCRIPT_DIR/local/libiconv-1.17 --with-zstd=$SCRIPT_DIR/local/zstd-1.5.5/lib --disable-werror
+../binutils-2.44/configure --prefix=$SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf --target=v850-unknown-elf --enable-languages=c,c++ --build="$BUILD_NAME" --host="$HOST_NAME" --with-pkgversion='Built by ckormanyos/real-time-cpp' --disable-plugins --enable-static --disable-shared --disable-tls --disable-libada --disable-libssp --disable-nls --enable-mingw-wildcard --with-gnu-as --with-dwarf2 --disable-__cxa_atexit --disable-threads --disable-win32-registry --disable-sjlj-exceptions --with-isl=$SCRIPT_DIR/local/isl-0.24 --with-cloog=$SCRIPT_DIR/local/cloog-0.18.1 --with-gmp=$SCRIPT_DIR/local/gmp-6.3.0 --with-mpfr=$SCRIPT_DIR/local/mpfr-4.2.1 --with-mpc=$SCRIPT_DIR/local/mpc-1.3.1 --with-libiconv-prefix=$SCRIPT_DIR/local/libiconv-1.17 --with-zstd=$SCRIPT_DIR/local/zstd-1.5.5/lib --disable-werror --enable-obsolete
 make --jobs=6
 make install
 echo
@@ -178,7 +178,7 @@ cp -r newlib libgloss ../gcc-"$MY_VERSION"
 cd ..
 mkdir objdir-gcc-"$MY_VERSION"-v850-unknown-elf
 cd objdir-gcc-"$MY_VERSION"-v850-unknown-elf
-../gcc-"$MY_VERSION"/configure --prefix=$SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf --target=v850-unknown-elf --enable-languages=c,c++ --build="$BUILD_NAME" --host="$HOST_NAME" --with-pkgversion='Built by ckormanyos/real-time-cpp' --disable-gcov --enable-static --disable-shared --with-newlib --disable-tls --disable-libada --disable-libssp --disable-nls --enable-mingw-wildcard --with-gnu-as --with-dwarf2 --disable-__cxa_atexit --disable-threads --disable-win32-registry --disable-sjlj-exceptions --disable-libquadmath --disable-fixed-point --disable-decimal-float --with-isl=$SCRIPT_DIR/local/isl-0.24 --with-cloog=$SCRIPT_DIR/local/cloog-0.18.1 --with-gmp=$SCRIPT_DIR/local/gmp-6.3.0 --with-mpfr=$SCRIPT_DIR/local/mpfr-4.2.1 --with-mpc=$SCRIPT_DIR/local/mpc-1.3.1 --with-libiconv-prefix=$SCRIPT_DIR/local/libiconv-1.17 --with-zstd=$SCRIPT_DIR/local/zstd-1.5.5/lib
+../gcc-"$MY_VERSION"/configure --prefix=$SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf --target=v850-unknown-elf --enable-languages=c,c++ --build="$BUILD_NAME" --host="$HOST_NAME" --with-pkgversion='Built by ckormanyos/real-time-cpp' --disable-gcov --enable-static --disable-shared --with-newlib --disable-tls --disable-libada --disable-libssp --disable-nls --enable-mingw-wildcard --with-gnu-as --with-dwarf2 --disable-__cxa_atexit --disable-threads --disable-win32-registry --disable-sjlj-exceptions --disable-libquadmath --disable-fixed-point --disable-decimal-float --with-isl=$SCRIPT_DIR/local/isl-0.24 --with-cloog=$SCRIPT_DIR/local/cloog-0.18.1 --with-gmp=$SCRIPT_DIR/local/gmp-6.3.0 --with-mpfr=$SCRIPT_DIR/local/mpfr-4.2.1 --with-mpc=$SCRIPT_DIR/local/mpc-1.3.1 --with-libiconv-prefix=$SCRIPT_DIR/local/libiconv-1.17 --with-zstd=$SCRIPT_DIR/local/zstd-1.5.5/lib --enable-obsolete
 make --jobs=6
 make install
 echo
