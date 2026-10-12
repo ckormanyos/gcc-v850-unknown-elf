@@ -175,7 +175,7 @@ echo
 
 
 cd $SCRIPT_DIR/gcc_build
-echo 'build gcc'
+echo 'build gcc with integrated newlib'
 tar -xf gcc-"$MY_VERSION".tar.xz
 tar -xf newlib-4.5.0.20241231.tar.gz
 cd newlib-4.5.0.20241231
@@ -186,9 +186,17 @@ cd objdir-gcc-"$MY_VERSION"-v850-unknown-elf
 
 ../gcc-"$MY_VERSION"/configure --prefix=$SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf --target=v850-unknown-elf --enable-languages=c,c++ --build="$BUILD_NAME" --host="$HOST_NAME" --disable-gcov --enable-static --disable-shared --with-newlib --with-headers --disable-tls --disable-libada --disable-libssp --disable-nls --enable-mingw-wildcard --with-gnu-as --with-dwarf2 --disable-__cxa_atexit --disable-threads --disable-win32-registry --disable-sjlj-exceptions --disable-libquadmath --disable-fixed-point --disable-decimal-float --with-isl=$SCRIPT_DIR/local/isl-0.24 --with-cloog=$SCRIPT_DIR/local/cloog-0.18.1 --with-gmp=$SCRIPT_DIR/local/gmp-6.3.0 --with-mpfr=$SCRIPT_DIR/local/mpfr-4.2.1 --with-mpc=$SCRIPT_DIR/local/mpc-1.3.1 --with-libiconv-prefix=$SCRIPT_DIR/local/libiconv-1.17 --with-zstd=$SCRIPT_DIR/local/zstd-1.5.5/lib --enable-obsolete
 
-# Run the standard sequential build to guarantee libstdc++ is built after Newlib is ready
+# 1. First, build everything natively using the combined tree layout
 make --jobs=6
+
+# 2. Force building explicit target libraries just to ensure Newlib didn't get lazy
+make all-target-newlib all-target-libgloss
+
+# 3. Complete the primary installation
 make install
+
+# 4. Explicitly force the target library installation so libc.a, libm.a, and crt0 are copied over
+make install-target-newlib install-target-libgloss
 echo
 
 ls -la $SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf/bin
