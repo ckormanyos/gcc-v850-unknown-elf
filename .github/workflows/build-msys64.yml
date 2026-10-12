@@ -39,6 +39,8 @@ jobs:
         run: |
           echo 'gcc-v850-unknown-elf-100.sh'
           ./gcc-v850-unknown-elf-100.sh ${{ matrix.gccversion }} x86_64-w64-mingw32 x86_64-w64-mingw32 /d/a/gcc-v850-unknown-elf/gcc-v850-unknown-elf/mingw
+          # Add this to pass the toolchain binaries to all subsequent GitHub Actions steps!
+          echo "/d/a/gcc-v850-unknown-elf/gcc-v850-unknown-elf/local/gcc-${{ matrix.gccversion }}-v850-unknown-elf/bin" >> $GITHUB_PATH
       - name: gcc-v850-unknown-elf-partially-verify-result
         run: |
           echo 'gcc-v850-unknown-elf partial verify result'
