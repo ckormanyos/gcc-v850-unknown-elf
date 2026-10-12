@@ -197,13 +197,24 @@ make --jobs=6 all-gcc all-target-newlib all-target-libgloss
 make install-gcc install-target-newlib install-target-libgloss
 
 # =====================================================================
-# PASS 2: Compile the rest. libstdc++-v3 can now successfully see
-#         the installed C environment and will build the C++ STL headers.
+# PASS 2: Configure, build, and install libstdc++-v3 (The STL)
 # =====================================================================
-echo '=== PASS 2: Building Full Toolchain with C++ STL ==='
+echo '=== PASS 2: Building C++ STL ==='
+
+# Force a re-configure of target libraries so libstdc++ sees the installed newlib headers
+make configure-target-libstdc++-v3
+
+# Build and install the STL explicitly
+make --jobs=6 all-target-libstdc++-v3
+make install-target-libstdc++-v3
+
+# =====================================================================
+# PASS 3: Compile the rest and finalize the toolchain
+# =====================================================================
+echo '=== PASS 3: Finalizing Toolchain Build ==='
 make --jobs=6
 make install
-echo
+echo 'Done!'
 
 
 ls -la $SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf/bin
