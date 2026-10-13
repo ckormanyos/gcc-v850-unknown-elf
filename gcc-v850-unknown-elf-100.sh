@@ -184,6 +184,12 @@ cd newlib-4.6.0.20260123
 cp -r newlib libgloss ../gcc-"$MY_VERSION"
 cd ..
 
+# =====================================================================
+# PATCH: Fix GCC 16 V850 compiler crash on C++ enum parsing
+# =====================================================================
+echo 'Applying V850 backend attribute patch...'
+sed -i '/v850_insert_attributes/!b;n;a\  if (TREE_CODE (decl) == CONST_DECL) return;' gcc-"$MY_VERSION"/gcc/config/v850/v850.cc
+
 mkdir objdir-gcc-"$MY_VERSION"-v850-unknown-elf
 cd objdir-gcc-"$MY_VERSION"-v850-unknown-elf
 
