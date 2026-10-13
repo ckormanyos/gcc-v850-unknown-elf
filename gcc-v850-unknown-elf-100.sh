@@ -89,7 +89,7 @@ tar -xf libiconv-1.17.tar.gz
 mkdir objdir-libiconv-1.17
 cd objdir-libiconv-1.17
 ../libiconv-1.17/configure --prefix=$SCRIPT_DIR/local/libiconv-1.17 --build="$BUILD_NAME" --target="$HOST_NAME" --host="$HOST_NAME" --enable-static --disable-shared
-make --jobs=6
+make --jobs=4
 make install
 echo
 
@@ -100,7 +100,7 @@ tar -xf gmp-6.3.0.tar.xz
 mkdir objdir-gmp-6.3.0
 cd objdir-gmp-6.3.0
 ../gmp-6.3.0/configure --prefix=$SCRIPT_DIR/local/gmp-6.3.0 --build="$BUILD_NAME" --target="$HOST_NAME" --host="$HOST_NAME" --enable-static --disable-shared
-make --jobs=6
+make --jobs=4
 make install
 echo
 
@@ -111,7 +111,7 @@ tar -xf mpfr-4.2.1.tar.xz
 mkdir objdir-mpfr-4.2.1
 cd objdir-mpfr-4.2.1
 ../mpfr-4.2.1/configure --prefix=$SCRIPT_DIR/local/mpfr-4.2.1 --build="$BUILD_NAME" --target="$HOST_NAME" --host="$HOST_NAME" --enable-static --disable-shared --with-gmp=$SCRIPT_DIR/local/gmp-6.3.0
-make --jobs=6
+make --jobs=4
 make install
 echo
 
@@ -122,7 +122,7 @@ tar -xf mpc-1.3.1.tar.gz
 mkdir objdir-mpc-1.3.1
 cd objdir-mpc-1.3.1
 ../mpc-1.3.1/configure --prefix=$SCRIPT_DIR/local/mpc-1.3.1 --build="$BUILD_NAME" --target="$HOST_NAME" --host="$HOST_NAME" --enable-static --disable-shared --with-gmp=$SCRIPT_DIR/local/gmp-6.3.0 --with-mpfr=$SCRIPT_DIR/local/mpfr-4.2.1
-make --jobs=6
+make --jobs=4
 make install
 echo
 
@@ -133,7 +133,7 @@ tar -xjf isl-0.24.tar.bz2
 mkdir objdir-isl-0.24
 cd objdir-isl-0.24
 ../isl-0.24/configure --prefix=$SCRIPT_DIR/local/isl-0.24 --build="$BUILD_NAME" --target="$HOST_NAME" --host="$HOST_NAME" --enable-static --disable-shared --with-gmp-prefix=$SCRIPT_DIR/local/gmp-6.3.0
-make --jobs=6
+make --jobs=4
 make install
 echo
 
@@ -144,7 +144,7 @@ tar -xf cloog-0.18.1.tar.gz
 mkdir objdir-cloog-0.18.1
 cd objdir-cloog-0.18.1
 ../cloog-0.18.1/configure --prefix=$SCRIPT_DIR/local/cloog-0.18.1 --build="$BUILD_NAME" --target="$HOST_NAME" --host="$HOST_NAME" --enable-static --disable-shared --with-isl=$SCRIPT_DIR/local/isl-0.24 --with-gmp-prefix=$SCRIPT_DIR/local/gmp-6.3.0
-make --jobs=6
+make --jobs=4
 make install
 echo
 
@@ -157,7 +157,7 @@ cd objdir-binutils-2.44-v850-unknown-elf-gcc-"$MY_VERSION"
 
 ../binutils-2.44/configure --prefix=$SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf --target=v850-unknown-elf --enable-languages=c,c++ --build="$BUILD_NAME" --host="$HOST_NAME" --disable-plugins --enable-static --disable-shared --disable-tls --disable-libada --disable-libssp --disable-nls --enable-mingw-wildcard --with-gnu-as --with-dwarf2 --disable-__cxa_atexit --disable-threads --disable-win32-registry --disable-sjlj-exceptions --with-isl=$SCRIPT_DIR/local/isl-0.24 --with-cloog=$SCRIPT_DIR/local/cloog-0.18.1 --with-gmp=$SCRIPT_DIR/local/gmp-6.3.0 --with-mpfr=$SCRIPT_DIR/local/mpfr-4.2.1 --with-mpc=$SCRIPT_DIR/local/mpc-1.3.1 --with-libiconv-prefix=$SCRIPT_DIR/local/libiconv-1.17 --with-zstd=$SCRIPT_DIR/local/zstd-1.5.5/lib --disable-werror --enable-obsolete
 
-make --jobs=6
+make --jobs=4
 make install
 
 # CRITICAL: Dynamically export the path using your variable so GCC can find the cross-linker
@@ -193,7 +193,7 @@ cd objdir-gcc-"$MY_VERSION"-v850-unknown-elf
 # PASS 1: Compile and install the C environment (Compiler + Newlib + Libgloss)
 # =====================================================================
 echo '=== PASS 1: Building GCC Core, Newlib, and Libgloss ==='
-make --jobs=6 all-gcc all-target-newlib all-target-libgloss
+make --jobs=4 all-gcc all-target-newlib all-target-libgloss
 make install-gcc install-target-newlib install-target-libgloss
 
 # =====================================================================
@@ -205,14 +205,14 @@ echo '=== PASS 2: Building C++ STL ==='
 make configure-target-libstdc++-v3
 
 # Build and install the STL explicitly
-make --jobs=6 all-target-libstdc++-v3
+make --jobs=4 all-target-libstdc++-v3
 make install-target-libstdc++-v3
 
 # =====================================================================
 # PASS 3: Compile the rest and finalize the toolchain
 # =====================================================================
 echo '=== PASS 3: Finalizing Toolchain Build ==='
-make --jobs=6
+make CFLAGS_FOR_TARGET="-O1 -g" CXXFLAGS_FOR_TARGET="-O1 -g" --jobs=4
 make install
 echo 'Done!'
 
