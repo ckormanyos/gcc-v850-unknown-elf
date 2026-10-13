@@ -187,8 +187,8 @@ cd ..
 # =====================================================================
 # PATCH: Fix GCC 16 V850 compiler crash on C++ enum parsing
 # =====================================================================
-echo 'Applying V850 backend attribute patch...'
-sed -i '/v850_insert_attributes/!b;n;a\  if (TREE_CODE (decl) == CONST_DECL) return;' gcc-"$MY_VERSION"/gcc/config/v850/v850.cc
+echo 'PATCH: Fix GCC 16 V850 compiler crash on C++ enum parsing...'
+sed -i '/^v850_insert_attributes (tree decl/ {n; a\  if (TREE_CODE (decl) == CONST_DECL) return;}' gcc-"$MY_VERSION"/gcc/config/v850/v850.cc
 
 mkdir objdir-gcc-"$MY_VERSION"-v850-unknown-elf
 cd objdir-gcc-"$MY_VERSION"-v850-unknown-elf
