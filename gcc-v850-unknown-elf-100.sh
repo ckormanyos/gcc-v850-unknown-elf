@@ -185,22 +185,22 @@ cp -r newlib libgloss ../gcc-"$MY_VERSION"
 cd ..
 
 # =====================================================================
-# PATCH: Fix GCC 16 V850 compiler crash on C++ enum parsing
+# PATCH: Fix GCC 16 V850 compiler crash on C++ enum parsing (so far only needed for 16.2.0)
 # =====================================================================
 if [ "$MY_VERSION" = "16.2.0" ]; then
     echo 'PATCH: Fix GCC 16 V850 compiler crash on C++ enum parsing...'
     # 1. Dynamically locate the exact line number where the function signature begins
     FUNC_LINE=$(grep -n "^v850_insert_attributes" gcc-"$MY_VERSION"/gcc/config/v850/v850.cc | cut -d: -f1)
+
+    # 2. Add 2 lines to get past the opening function bracket '{' and inject the safety guard
+    TARGET_LINE=$((FUNC_LINE + 2))
+    echo "Found v850_insert_attributes at line $FUNC_LINE. Patching line $TARGET_LINE..."
+
+    # 3. Inject the early-return guard safely into the active execution path
+    sed -i "${TARGET_LINE}i\  if (TREE_CODE (decl) == CONST_DECL) return;" gcc-"$MY_VERSION"/gcc/config/v850/v850.cc
 else
     echo "Skipping patch: MY_VERSION is $MY_VERSION (so far only needed for 16.2.0)"
 fi
-
-# 2. Add 2 lines to get past the opening function bracket '{' and inject the safety guard
-TARGET_LINE=$((FUNC_LINE + 2))
-echo "Found v850_insert_attributes at line $FUNC_LINE. Patching line $TARGET_LINE..."
-
-# 3. Inject the early-return guard safely into the active execution path
-sed -i "${TARGET_LINE}i\  if (TREE_CODE (decl) == CONST_DECL) return;" gcc-"$MY_VERSION"/gcc/config/v850/v850.cc
 
 mkdir objdir-gcc-"$MY_VERSION"-v850-unknown-elf
 cd objdir-gcc-"$MY_VERSION"-v850-unknown-elf
