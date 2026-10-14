@@ -68,7 +68,7 @@ wget --no-check-certificate https://gcc.gnu.org/pub/gcc/infrastructure/isl-0.24.
 wget --no-check-certificate https://gcc.gnu.org/pub/gcc/infrastructure/cloog-0.18.1.tar.gz
 wget --no-check-certificate https://ftp.gnu.org/gnu/binutils/binutils-2.44.tar.xz
 wget --no-check-certificate https://ftp.gnu.org/gnu/gcc/gcc-"$MY_VERSION"/gcc-"$MY_VERSION".tar.xz
-wget --no-check-certificate ftp://sourceware.org/pub/newlib/newlib-4.5.0.20241231.tar.gz
+wget --no-check-certificate ftp://sourceware.org/pub/newlib/newlib-4.6.0.20260123.tar.gz
 echo
 
 
@@ -89,7 +89,7 @@ tar -xf libiconv-1.17.tar.gz
 mkdir objdir-libiconv-1.17
 cd objdir-libiconv-1.17
 ../libiconv-1.17/configure --prefix=$SCRIPT_DIR/local/libiconv-1.17 --build="$BUILD_NAME" --target="$HOST_NAME" --host="$HOST_NAME" --enable-static --disable-shared
-make --jobs=6
+make --jobs=4
 make install
 echo
 
@@ -100,7 +100,7 @@ tar -xf gmp-6.3.0.tar.xz
 mkdir objdir-gmp-6.3.0
 cd objdir-gmp-6.3.0
 ../gmp-6.3.0/configure --prefix=$SCRIPT_DIR/local/gmp-6.3.0 --build="$BUILD_NAME" --target="$HOST_NAME" --host="$HOST_NAME" --enable-static --disable-shared
-make --jobs=6
+make --jobs=4
 make install
 echo
 
@@ -111,7 +111,7 @@ tar -xf mpfr-4.2.1.tar.xz
 mkdir objdir-mpfr-4.2.1
 cd objdir-mpfr-4.2.1
 ../mpfr-4.2.1/configure --prefix=$SCRIPT_DIR/local/mpfr-4.2.1 --build="$BUILD_NAME" --target="$HOST_NAME" --host="$HOST_NAME" --enable-static --disable-shared --with-gmp=$SCRIPT_DIR/local/gmp-6.3.0
-make --jobs=6
+make --jobs=4
 make install
 echo
 
@@ -122,7 +122,7 @@ tar -xf mpc-1.3.1.tar.gz
 mkdir objdir-mpc-1.3.1
 cd objdir-mpc-1.3.1
 ../mpc-1.3.1/configure --prefix=$SCRIPT_DIR/local/mpc-1.3.1 --build="$BUILD_NAME" --target="$HOST_NAME" --host="$HOST_NAME" --enable-static --disable-shared --with-gmp=$SCRIPT_DIR/local/gmp-6.3.0 --with-mpfr=$SCRIPT_DIR/local/mpfr-4.2.1
-make --jobs=6
+make --jobs=4
 make install
 echo
 
@@ -133,7 +133,7 @@ tar -xjf isl-0.24.tar.bz2
 mkdir objdir-isl-0.24
 cd objdir-isl-0.24
 ../isl-0.24/configure --prefix=$SCRIPT_DIR/local/isl-0.24 --build="$BUILD_NAME" --target="$HOST_NAME" --host="$HOST_NAME" --enable-static --disable-shared --with-gmp-prefix=$SCRIPT_DIR/local/gmp-6.3.0
-make --jobs=6
+make --jobs=4
 make install
 echo
 
@@ -144,7 +144,7 @@ tar -xf cloog-0.18.1.tar.gz
 mkdir objdir-cloog-0.18.1
 cd objdir-cloog-0.18.1
 ../cloog-0.18.1/configure --prefix=$SCRIPT_DIR/local/cloog-0.18.1 --build="$BUILD_NAME" --target="$HOST_NAME" --host="$HOST_NAME" --enable-static --disable-shared --with-isl=$SCRIPT_DIR/local/isl-0.24 --with-gmp-prefix=$SCRIPT_DIR/local/gmp-6.3.0
-make --jobs=6
+make --jobs=4
 make install
 echo
 
@@ -154,10 +154,14 @@ echo 'build binutils'
 tar -xf binutils-2.44.tar.xz
 mkdir objdir-binutils-2.44-v850-unknown-elf-gcc-"$MY_VERSION"
 cd objdir-binutils-2.44-v850-unknown-elf-gcc-"$MY_VERSION"
+
 ../binutils-2.44/configure --prefix=$SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf --target=v850-unknown-elf --enable-languages=c,c++ --build="$BUILD_NAME" --host="$HOST_NAME" --with-pkgversion='Built by ckormanyos/real-time-cpp' --disable-plugins --enable-static --disable-shared --disable-tls --disable-libada --disable-libssp --disable-nls --enable-mingw-wildcard --with-gnu-as --with-dwarf2 --disable-__cxa_atexit --disable-threads --disable-win32-registry --disable-sjlj-exceptions --with-isl=$SCRIPT_DIR/local/isl-0.24 --with-cloog=$SCRIPT_DIR/local/cloog-0.18.1 --with-gmp=$SCRIPT_DIR/local/gmp-6.3.0 --with-mpfr=$SCRIPT_DIR/local/mpfr-4.2.1 --with-mpc=$SCRIPT_DIR/local/mpc-1.3.1 --with-libiconv-prefix=$SCRIPT_DIR/local/libiconv-1.17 --with-zstd=$SCRIPT_DIR/local/zstd-1.5.5/lib --disable-werror --enable-obsolete
-make --jobs=6
+
+make --jobs=4
 make install
-export PATH="$SCRIPT_DIR/local/gcc-16.2.0-v850-unknown-elf/bin:$PATH"
+
+# CRITICAL: Dynamically export the path using your variable so GCC can find the cross-linker
+export PATH="$SCRIPT_DIR/local/gcc-$MY_VERSION-v850-unknown-elf/bin:$PATH"
 echo
 
 
@@ -171,23 +175,65 @@ echo
 
 
 cd $SCRIPT_DIR/gcc_build
-echo 'build gcc'
+echo 'build gcc with integrated newlib & libgloss'
 tar -xf gcc-"$MY_VERSION".tar.xz
-tar -xf newlib-4.5.0.20241231.tar.gz
-cd newlib-4.5.0.20241231
+tar -xf newlib-4.6.0.20260123.tar.gz
+
+# 1. Merge both folders into the GCC source tree for a true combined tree build
+cd newlib-4.6.0.20260123
 cp -r newlib libgloss ../gcc-"$MY_VERSION"
 cd ..
+
+# =====================================================================
+# PATCH: Fix GCC 16 V850 compiler crash on C++ enum parsing (so far only needed for 16.2.0)
+# =====================================================================
+if [ "$MY_VERSION" = "16.2.0" ]; then
+    echo 'PATCH: Fix GCC 16 V850 compiler crash on C++ enum parsing...'
+    # 1. Dynamically locate the exact line number where the function signature begins
+    FUNC_LINE=$(grep -n "^v850_insert_attributes" gcc-"$MY_VERSION"/gcc/config/v850/v850.cc | cut -d: -f1)
+
+    # 2. Add 2 lines to get past the opening function bracket '{' and inject the safety guard
+    TARGET_LINE=$((FUNC_LINE + 2))
+    echo "Found v850_insert_attributes at line $FUNC_LINE. Patching line $TARGET_LINE..."
+
+    # 3. Inject the early-return guard safely into the active execution path
+    sed -i "${TARGET_LINE}i\  if (TREE_CODE (decl) == CONST_DECL) return;" gcc-"$MY_VERSION"/gcc/config/v850/v850.cc
+else
+    echo "Skipping patch: MY_VERSION is $MY_VERSION (so far only needed for 16.2.0)"
+fi
+
 mkdir objdir-gcc-"$MY_VERSION"-v850-unknown-elf
 cd objdir-gcc-"$MY_VERSION"-v850-unknown-elf
-../gcc-"$MY_VERSION"/configure --prefix=$SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf --target=v850-unknown-elf --enable-languages=c,c++ --build="$BUILD_NAME" --host="$HOST_NAME" --with-pkgversion='Built by ckormanyos/real-time-cpp' --disable-gcov --enable-static --disable-shared --with-newlib --with-headers --disable-tls --disable-libada --disable-libssp --disable-nls --enable-mingw-wildcard --with-gnu-as --with-dwarf2 --disable-__cxa_atexit --disable-threads --disable-win32-registry --disable-sjlj-exceptions --disable-libquadmath --disable-fixed-point --disable-decimal-float --with-isl=$SCRIPT_DIR/local/isl-0.24 --with-cloog=$SCRIPT_DIR/local/cloog-0.18.1 --with-gmp=$SCRIPT_DIR/local/gmp-6.3.0 --with-mpfr=$SCRIPT_DIR/local/mpfr-4.2.1 --with-mpc=$SCRIPT_DIR/local/mpc-1.3.1 --with-libiconv-prefix=$SCRIPT_DIR/local/libiconv-1.17 --with-zstd=$SCRIPT_DIR/local/zstd-1.5.5/lib --enable-obsolete
 
-# Explicitly build the compiler, newlib, and target support libraries
-make --jobs=6 all-gcc all-target-libgcc all-target-newlib all-target-libgloss
+../gcc-"$MY_VERSION"/configure --prefix=$SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf --target=v850-unknown-elf --enable-languages=c,c++ --build="$BUILD_NAME" --host="$HOST_NAME" --with-pkgversion='Built by ckormanyos/real-time-cpp' --disable-gcov --enable-static --disable-shared --with-newlib --with-headers --disable-tls --disable-libada --disable-libssp --disable-nls --enable-mingw-wildcard --with-gnu-as --with-dwarf2 --disable-__cxa_atexit --disable-threads --disable-win32-registry --disable-sjlj-exceptions --disable-libquadmath --disable-fixed-point --disable-decimal-float --with-isl=$SCRIPT_DIR/local/isl-0.24 --with-cloog=$SCRIPT_DIR/local/cloog-0.18.1 --with-gmp=$SCRIPT_DIR/local/gmp-6.3.0 --with-mpfr=$SCRIPT_DIR/local/mpfr-4.2.1 --with-mpc=$SCRIPT_DIR/local/mpc-1.3.1 --with-libiconv-prefix=$SCRIPT_DIR/local/libiconv-1.17 --with-zstd=$SCRIPT_DIR/local/zstd-1.5.5/lib --enable-obsolete --disable-libstdcxx-pch
 
-# Explicitly install them all
-make install-gcc install-target-libgcc install-target-newlib install-target-libgloss
+# =====================================================================
+# PASS 1: Compile and install the C environment (Compiler + Newlib + Libgloss)
+# =====================================================================
+echo '=== PASS 1: Building GCC Core, Newlib, and Libgloss ==='
+make --jobs=4 all-gcc all-target-newlib all-target-libgloss
+make install-gcc install-target-newlib install-target-libgloss
 
-echo
+# =====================================================================
+# PASS 2: Configure, build, and install libstdc++-v3 (The STL)
+# =====================================================================
+echo '=== PASS 2: Building C++ STL ==='
+
+# Force a re-configure of target libraries so libstdc++ sees the installed newlib headers
+make configure-target-libstdc++-v3
+
+# Build and install the STL explicitly
+make --jobs=4 all-target-libstdc++-v3
+make install-target-libstdc++-v3
+
+# =====================================================================
+# PASS 3: Compile the rest and finalize the toolchain
+# =====================================================================
+echo '=== PASS 3: Finalizing Toolchain Build ==='
+make CFLAGS_FOR_TARGET="-O1 -g" CXXFLAGS_FOR_TARGET="-O1 -g" --jobs=4
+make install
+echo 'Done!'
+
 
 ls -la $SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf/bin
 ls -la $SCRIPT_DIR/local/gcc-"$MY_VERSION"-v850-unknown-elf/bin/v850-unknown-elf-gcc*
